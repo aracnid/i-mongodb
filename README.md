@@ -38,7 +38,7 @@ TODO
 
 - **Jason Romano** - [Aracnid](https://github.com/aracnid)
 
-See also the list of [contributors](https://github.com/lakeannebrewhouse/i-mongodb/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/aracnid/i-mongodb/contributors) who participated in this project.
 
 ## License
 

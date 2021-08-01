@@ -6,7 +6,7 @@ build-backend = "flit_core.buildapi"
 module = "i_mongodb"
 author = "Jason Romano"
 author-email = "aracnid@gmail.com"
-home-page = "https://github.com/lakeannebrewhouse/i-mongodb"
+home-page = "https://github.com/aracnid/i-mongodb"
 classifiers = ["License :: OSI Approved :: MIT License"]
 description-file = "README.md"
 requires-python = ">=3.9"
