@@ -20,15 +20,9 @@
         }
     },
     "loggers": {
-        "squaredown.i_logger": {
+        "i-mongodb.i_logger": {
             "level": "DEBUG",
             "propagate": false
-        },
-        "squaredown.catalog": {
-            "level": "DEBUG"
-        },
-        "squaredown.orders": {
-            "level": "INFO"
         },
         "urllib3": {
             "level": "WARNING"

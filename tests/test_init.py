@@ -1,8 +1,8 @@
-"""Test functions for Squaredown import.
+"""Test functions for i-MongoDB import.
 """
-import squaredown
+import i_mongodb
 
 def test_version():
-    """Tests that Squaredown was imported successfully.
+    """Tests that i-MongoDB was imported successfully.
     """
-    assert squaredown.__version__
+    assert i_mongodb.__version__

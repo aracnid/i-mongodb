@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timezone
 import pytest
 
-import squaredown as sqd
+import i_mongodb as imdb
 
 # initialize module variables
 TEST_PROPS_NAME = '_test_props'
@@ -17,7 +17,7 @@ UTC = timezone.utc
 def fixture_config_obj():
     """Pytest fixture to initialize and return a Config object
     """
-    return sqd.Config()
+    return imdb.Config()
 
 @pytest.fixture(name='config_props')
 def fixture_config_props(config_obj):
@@ -37,7 +37,7 @@ def test_init_config_db(config_obj):
 def test_init_config_collection(config_obj):
     """Tests Config collection initialization.
     """
-    config_collection = os.environ.get('SQUAREDOWN_CONFIG')
+    config_collection = os.environ.get('CONFIG_COLLECTION')
     assert config_obj._collection_name == config_collection
 
     assert config_obj._collection

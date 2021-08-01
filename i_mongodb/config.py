@@ -4,7 +4,7 @@ import os
 
 from aracnid_logger import Logger
 
-from squaredown.i_mongodb import MongoDBInterface
+from i_mongodb.i_mongodb import MongoDBInterface
 
 # initialize logging
 logger = Logger(__name__).get_logger()
@@ -14,7 +14,7 @@ class Config(MongoDBInterface):
     """The Config class is the configuration data store.
 
     Environment Variables:
-        SQUAREDOWN_CONFIG: Name of the configuration collection in MongoDB.
+        CONFIG_COLLECTION: Name of the configuration collection in MongoDB.
 
     Properties:
         auto_update: Process flag to automatically update properties to MongoDB.
@@ -33,7 +33,7 @@ class Config(MongoDBInterface):
         super().__init__()
 
         # read environment variables
-        self._collection_name = os.environ.get('SQUAREDOWN_CONFIG')
+        self._collection_name = os.environ.get('CONFIG_COLLECTION')
 
         # initialize variables
         self._props = {}

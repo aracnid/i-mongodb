@@ -1,11 +1,11 @@
-"""Test functions for i_mongo.py.
+"""Test functions for i_mongodb.py.
 """
 from datetime import datetime
 from dateutil import tz, utils
 
 import pytest
 
-import squaredown as sqd
+import i_mongodb as imdb
 
 # initialize module variables
 DB_NAME = '_testdb'
@@ -18,7 +18,7 @@ DT_LOCAL = utils.default_tzinfo(DT_NAIVE, tz.tzlocal())
 def fixture_mongodb_interface():
     """Pytest fixture to initialize and return the MongoDBInterface object.
     """
-    return sqd.i_mongodb.MongoDBInterface(db_name=DB_NAME)
+    return imdb.i_mongodb.MongoDBInterface(db_name=DB_NAME)
 
 def test_init_mongodb(mongodb_if):
     """Tests MongoDB initialization.
