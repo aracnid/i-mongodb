@@ -18,7 +18,7 @@ DT_LOCAL = utils.default_tzinfo(DT_NAIVE, tz.tzlocal())
 def fixture_mongodb_interface():
     """Pytest fixture to initialize and return the MongoDBInterface object.
     """
-    return imdb.i_mongodb.MongoDBInterface(db_name=DB_NAME)
+    return imdb.MongoDBInterface(db_name=DB_NAME)
 
 def test_init_mongodb(mongodb_if):
     """Tests MongoDB initialization.
