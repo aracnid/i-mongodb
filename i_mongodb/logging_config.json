@@ -20,10 +20,6 @@
         }
     },
     "loggers": {
-        "i-mongodb.i_logger": {
-            "level": "DEBUG",
-            "propagate": false
-        },
         "urllib3": {
             "level": "WARNING"
         }
