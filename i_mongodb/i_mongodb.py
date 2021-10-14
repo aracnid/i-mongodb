@@ -93,3 +93,6 @@ class MongoDBInterface:
             None
         """
         self.mdb.drop_collection(name_or_collection=name)
+
+    def __getattr__(self, name):
+        return self.read_collection(name)

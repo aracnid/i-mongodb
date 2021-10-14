@@ -47,6 +47,13 @@ def test_read_collection(mongodb_if):
     collection = mongodb_if.read_collection(collection_name)
     assert collection.name == collection_name
 
+def test_read_collection_by_attr(mongodb_if):
+    """Tests collection read.
+    """
+    collection_name = '_test'
+    collection = mongodb_if._test
+    assert collection.name == collection_name
+
 @pytest.fixture(name='test_collection')
 def fixture_datetime_test_collection(mongodb_if):
     """Pytest fixture to set a document with different datetime formats.
