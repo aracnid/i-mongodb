@@ -1,15 +1,29 @@
 """Class module to interface with MongoDB.
 """
+from decimal import Decimal
 import os
 
 from aracnid_logger import Logger
-from bson.codec_options import CodecOptions
+from bson.codec_options import CodecOptions, TypeCodec, TypeRegistry
+from bson.decimal128 import Decimal128
 from dateutil import tz
 import pymongo
 
 # initialize logging
 logger = Logger(__name__).get_logger()
 
+class DecimalCodec(TypeCodec):
+    python_type = Decimal    # the Python type acted upon by this type codec
+    bson_type = Decimal128   # the BSON type acted upon by this type codec
+    def transform_python(self, value):
+        """Function that transforms a custom type value into a type that BSON can encode.
+        """
+        return Decimal128(value)
+
+    def transform_bson(self, value):
+        """Function that transforms a vanilla BSON type value into our
+        custom type."""
+        return value.to_decimal()
 
 class MongoDBInterface:
     """MongoDB interface class.
@@ -55,7 +69,13 @@ class MongoDBInterface:
         self.mongo_client = pymongo.MongoClient(host=connection_string)
 
         # initialize mongodb database
-        codec_options = CodecOptions(tz_aware=True, tzinfo=tz.tzlocal())
+        decimal_codec = DecimalCodec()
+        type_registry = TypeRegistry([decimal_codec])
+        codec_options = CodecOptions(
+            tz_aware=True, 
+            tzinfo=tz.tzlocal(),
+            type_registry=type_registry
+        )
         self.mdb = pymongo.database.Database(
             client=self.mongo_client,
             name=self.db_name,

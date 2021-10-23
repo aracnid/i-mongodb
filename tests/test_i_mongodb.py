@@ -32,7 +32,18 @@ def test_init_mongodb(mongodb_if):
 def test_create_collection(mongodb_if):
     """Tests collection creation.
     """
-    collection_name = '_test'
+    collection_name = '_test_create'
+
+    # delete collection if already present
+    collection_name_list = mongodb_if.mdb.list_collection_names()
+    if collection_name in collection_name_list:
+        mongodb_if.mdb[collection_name].drop()
+
+    # verify that the collection if not present
+    collection_name_list = mongodb_if.mdb.list_collection_names()
+    assert collection_name not in collection_name_list
+
+    # create collection
     collection = mongodb_if.create_collection(collection_name)
     assert collection.name == collection_name
 
@@ -108,7 +119,16 @@ def test_read_datetime_tz_naive(test_collection):
 def test_delete_collection(mongodb_if):
     """Tests collection deletion.
     """
-    collection_name = '_test'
+    collection_name = '_test_delete'
+
+    # create collection if not already present
+    mongodb_if.create_collection(collection_name)
+
+    # verify that the collection if present
+    collection_name_list = mongodb_if.mdb.list_collection_names()
+    assert collection_name in collection_name_list
+
+    # delete the collection
     mongodb_if.delete_collection(collection_name)
 
     # verify that the collection was deleted
