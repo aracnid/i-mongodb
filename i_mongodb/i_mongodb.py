@@ -1,7 +1,9 @@
 """Class module to interface with MongoDB.
 """
+from datetime import date
 from decimal import Decimal
 import os
+import re
 
 from aracnid_logger import Logger
 from bson.codec_options import CodecOptions, TypeCodec, TypeRegistry
@@ -24,6 +26,22 @@ class DecimalCodec(TypeCodec):
         """Function that transforms a vanilla BSON type value into our
         custom type."""
         return value.to_decimal()
+
+class DateCodec(TypeCodec):
+    python_type = date    # the Python type acted upon by this type codec
+    bson_type = str   # the BSON type acted upon by this type codec
+    def transform_python(self, value):
+        """Function that transforms a custom type value into a type that BSON can encode.
+        """
+        return value.isoformat()
+
+    def transform_bson(self, value):
+        """Function that transforms a vanilla BSON type value into our
+        custom type."""
+        if re.search(pattern='\d{4}-\d{2}-\d{2}', string=value):
+            return date.fromisoformat(value)
+        else:
+            return value
 
 class MongoDBInterface:
     """MongoDB interface class.
@@ -70,7 +88,8 @@ class MongoDBInterface:
 
         # initialize mongodb database
         decimal_codec = DecimalCodec()
-        type_registry = TypeRegistry([decimal_codec])
+        date_codec = DateCodec()
+        type_registry = TypeRegistry([decimal_codec, date_codec])
         codec_options = CodecOptions(
             tz_aware=True, 
             tzinfo=tz.tzlocal(),

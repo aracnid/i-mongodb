@@ -1,6 +1,6 @@
-"""Test functions for decimal codec.
+"""Test functions for date codec.
 """
-from decimal import Decimal
+from datetime import date
 
 import pytest
 
@@ -16,28 +16,28 @@ def fixture_mongodb_interface():
     """
     return imdb.MongoDBInterface(db_name=DB_NAME)
 
-def test_encode_decimal(mdb):
-    """Tests inserting a document with Decimal values.
+def test_encode_date(mdb):
+    """Tests inserting a document with date values.
     """
     doc_write = {
-        '_id': 'test_decimal',
-        'decimal_value': Decimal('123.456')
+        '_id': 'test_date',
+        'date_value': date.today()
     }
 
     doc_read = mdb._test.find_one_and_replace(
-        filter={'_id': 'test_decimal'},
+        filter={'_id': 'test_date'},
         replacement=doc_write,
         upsert=True)
 
-    assert type(doc_read['decimal_value']) is Decimal
+    assert type(doc_read['date_value']) is date
 
 
 def test_decode_decimal(mdb):
-    """Tests retrieving a document back into Decimal values.
+    """Tests retrieving a document back into date values.
     """
     doc_read = mdb._test.find_one(
-        filter={'_id': 'test_decimal'}
+        filter={'_id': 'test_date'}
     )
 
     assert doc_read
-    assert type(doc_read['decimal_value']) is Decimal
+    assert type(doc_read['date_value']) is date
