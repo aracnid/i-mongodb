@@ -20,12 +20,12 @@ def test_encode_decimal(mdb):
     """Tests inserting a document with Decimal values.
     """
     doc_write = {
-        '_id': 'test_decimal',
+        '_id': 'test_decimal_codec',
         'decimal_value': Decimal('123.456')
     }
 
     doc_read = mdb._test.find_one_and_replace(
-        filter={'_id': 'test_decimal'},
+        filter={'_id': 'test_decimal_codec'},
         replacement=doc_write,
         upsert=True)
 
@@ -36,7 +36,7 @@ def test_decode_decimal(mdb):
     """Tests retrieving a document back into Decimal values.
     """
     doc_read = mdb._test.find_one(
-        filter={'_id': 'test_decimal'}
+        filter={'_id': 'test_decimal_codec'}
     )
 
     assert doc_read

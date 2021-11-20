@@ -38,7 +38,7 @@ class DateCodec(TypeCodec):
     def transform_bson(self, value):
         """Function that transforms a vanilla BSON type value into our
         custom type."""
-        if re.search(pattern='\d{4}-\d{2}-\d{2}', string=value):
+        if re.search(pattern='^\d{4}-\d{2}-\d{2}$', string=value):
             return date.fromisoformat(value)
         else:
             return value
