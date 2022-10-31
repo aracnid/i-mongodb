@@ -10,6 +10,7 @@ verify_ssl = true
 
 [dev-packages]
 flit = "*"
+pylint = "*"
 pytest = "*"
 
 [packages]
@@ -19,7 +20,7 @@ pymongo = {extras = ["srv"], version = "*"}
 python-dateutil = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"
 
 [pipenv]
 allow_prereleases = true

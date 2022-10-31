@@ -24,7 +24,7 @@ def test_init_mongodb(mongodb_if):
     """Tests MongoDB initialization.
     """
     mdb = mongodb_if.mdb
-    assert mdb
+    assert mdb is not None
 
     # verify database name
     assert mdb.name == DB_NAME
