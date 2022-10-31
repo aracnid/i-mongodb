@@ -21,3 +21,8 @@ keywords = "python,mongodb"
 [tools.flit.metadata.requires-extra]
 test = ["pytest"]
 build = ["flit"]
+
+[tool.pytest.ini_options]
+addopts = "-p no:warnings"
+log_cli = true
+log_cli_level = "DEBUG"
