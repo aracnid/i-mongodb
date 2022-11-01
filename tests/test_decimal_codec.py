@@ -4,19 +4,17 @@ from decimal import Decimal
 
 import pytest
 
-import i_mongodb as imdb
-
-# initialize module variables
-DB_NAME = '_testdb'
+from i_mongodb import MongoDBInterface
 
 
-@pytest.fixture(name='mdb')
+@pytest.fixture(name='test_collection')
 def fixture_mongodb_interface():
     """Pytest fixture to initialize and return the MongoDBInterface object.
     """
-    return imdb.MongoDBInterface(db_name=DB_NAME)
+    mdb = MongoDBInterface().get_mdb(db_name='_testdb')
+    return mdb.get_collection('_test')
 
-def test_encode_decimal(mdb):
+def test_encode_decimal(test_collection):
     """Tests inserting a document with Decimal values.
     """
     doc_write = {
@@ -24,20 +22,20 @@ def test_encode_decimal(mdb):
         'decimal_value': Decimal('123.456')
     }
 
-    doc_read = mdb._test.find_one_and_replace(
+    doc_read = test_collection.find_one_and_replace(
         filter={'_id': 'test_decimal_codec'},
         replacement=doc_write,
         upsert=True)
 
-    assert type(doc_read['decimal_value']) is Decimal
+    assert isinstance(doc_read['decimal_value'], Decimal)
 
 
-def test_decode_decimal(mdb):
+def test_decode_decimal(test_collection):
     """Tests retrieving a document back into Decimal values.
     """
-    doc_read = mdb._test.find_one(
+    doc_read = test_collection.find_one(
         filter={'_id': 'test_decimal_codec'}
     )
 
     assert doc_read
-    assert type(doc_read['decimal_value']) is Decimal
+    assert isinstance(doc_read['decimal_value'], Decimal)

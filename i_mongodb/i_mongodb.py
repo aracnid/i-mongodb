@@ -15,6 +15,8 @@ import pymongo
 logger = Logger(__name__).get_logger()
 
 class DecimalCodec(TypeCodec):
+    """Codec to transform between Python Decimal an MongoDB Decimal128.
+    """
     python_type = Decimal    # the Python type acted upon by this type codec
     bson_type = Decimal128   # the BSON type acted upon by this type codec
     def transform_python(self, value):
@@ -28,6 +30,8 @@ class DecimalCodec(TypeCodec):
         return value.to_decimal()
 
 class DateCodec(TypeCodec):
+    """Codec to transform between Python date and MongoDB string representation.
+    """
     python_type = date    # the Python type acted upon by this type codec
     bson_type = str   # the BSON type acted upon by this type codec
     def transform_python(self, value):
@@ -38,10 +42,10 @@ class DateCodec(TypeCodec):
     def transform_bson(self, value):
         """Function that transforms a vanilla BSON type value into our
         custom type."""
-        if re.search(pattern='^\d{4}-\d{2}-\d{2}$', string=value):
+        if re.search(pattern=r'^\d{4}-\d{2}-\d{2}$', string=value):
             return date.fromisoformat(value)
-        else:
-            return value
+
+        return value
 
 class MongoDBInterface:
     """MongoDB interface class.
@@ -62,8 +66,12 @@ class MongoDBInterface:
 
     DuplicateKeyError = pymongo.errors.DuplicateKeyError
 
+    __connection_string = None
+    __mongo_client = None
+    __codec_options = None
 
-    def __init__(self, db_name=None):
+
+    def __init__(self):
         """Initializes the interface with the database name.
 
         If no database name is supplied, the name is read from environment.
@@ -71,34 +79,70 @@ class MongoDBInterface:
         Args:
             db_name: The name of the interfacing database.
         """
-        # read environment variables
-        mdb_user_token = os.environ.get('MONGODB_USER_TOKEN')
-        mdb_hostname = os.environ.get('MONGODB_HOSTNAME')
-        self.db_name = os.environ.get('MONGODB_DBNAME')
+        # initialize object variables
+        self.mdb = None
+        self.db_name = None
 
-        # override database name, if provided
+        if MongoDBInterface.__mongo_client is None:
+            # read environment variables
+            mdb_user_token = os.environ.get('MONGODB_USER_TOKEN')
+            mdb_hostname = os.environ.get('MONGODB_HOSTNAME')
+
+            # initialize mongodb client
+            MongoDBInterface.__connection_string = (
+                f'mongodb+srv://{mdb_user_token}@{mdb_hostname}'
+                '/?retryWrites=true')
+            MongoDBInterface.get_client()
+
+            # initialize mongodb database
+            decimal_codec = DecimalCodec()
+            date_codec = DateCodec()
+            type_registry = TypeRegistry([decimal_codec, date_codec])
+            MongoDBInterface.__codec_options = CodecOptions(
+                tz_aware=True,
+                tzinfo=tz.tzlocal(),
+                type_registry=type_registry
+            )
+
+            logger.debug('established connection')
+
+        else:
+            logger.debug('already established connection')
+
+        # if db_name:
+        #     self.get_mdb(db_name=db_name)
+
+    @staticmethod
+    def get_client():
+        """Return MongoDB client.
+
+        This function will connect to the service once, if it hasn't be established.
+        """
+        if MongoDBInterface.__mongo_client is None:
+            MongoDBInterface.__mongo_client = pymongo.MongoClient(
+                host=MongoDBInterface.__connection_string
+            )
+
+        return MongoDBInterface.__mongo_client
+
+    def get_mdb(self, db_name=None):
+        """Return the database object
+        """
         if db_name:
             self.db_name = db_name
+            self.mdb = None
+        else:
+            if not self.db_name:
+                self.db_name = os.environ.get('MONGODB_DBNAME')
 
-        # initialize mongodb client
-        connection_string = (
-            f'mongodb+srv://{mdb_user_token}@{mdb_hostname}'
-            '/?retryWrites=true')
-        self.mongo_client = pymongo.MongoClient(host=connection_string)
+        if self.mdb is None:
+            self.mdb = pymongo.database.Database(
+                client=self.get_client(),
+                name=self.db_name,
+                codec_options=MongoDBInterface.__codec_options
+            )
 
-        # initialize mongodb database
-        decimal_codec = DecimalCodec()
-        date_codec = DateCodec()
-        type_registry = TypeRegistry([decimal_codec, date_codec])
-        codec_options = CodecOptions(
-            tz_aware=True, 
-            tzinfo=tz.tzlocal(),
-            type_registry=type_registry
-        )
-        self.mdb = pymongo.database.Database(
-            client=self.mongo_client,
-            name=self.db_name,
-            codec_options=codec_options)
+        return self.mdb
 
     def create_collection(self, name):
         """Creates and returns the specified collection.
@@ -135,3 +179,11 @@ class MongoDBInterface:
 
     def __getattr__(self, name):
         return self.read_collection(name)
+
+    def disconnect(self):
+        """Disconnect from the MongoDB service.
+        """
+        MongoDBInterface.__mongo_client.close()
+        MongoDBInterface.__mongo_client = None
+        self.mdb = None
+        self.db_name = None
