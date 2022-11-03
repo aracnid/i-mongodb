@@ -2,7 +2,7 @@
 """
 
 # import package modules
-from i_mongodb.i_mongodb import MongoDBInterface
+from i_mongodb.i_mongodb import MongoDBInterface, MongoDBDatabase
 
 
 __version__ = '1.0.1'

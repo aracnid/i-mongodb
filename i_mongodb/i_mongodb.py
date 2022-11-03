@@ -14,6 +14,7 @@ import pymongo
 # initialize logging
 logger = Logger(__name__).get_logger()
 
+
 class DecimalCodec(TypeCodec):
     """Codec to transform between Python Decimal an MongoDB Decimal128.
     """
@@ -94,7 +95,7 @@ class MongoDBInterface:
                 '/?retryWrites=true')
             MongoDBInterface.get_client()
 
-            # initialize mongodb database
+            # initialize codec options
             decimal_codec = DecimalCodec()
             date_codec = DateCodec()
             type_registry = TypeRegistry([decimal_codec, date_codec])
@@ -109,9 +110,6 @@ class MongoDBInterface:
         else:
             logger.debug('already established connection')
 
-        # if db_name:
-        #     self.get_mdb(db_name=db_name)
-
     @staticmethod
     def get_client():
         """Return MongoDB client.
@@ -125,24 +123,93 @@ class MongoDBInterface:
 
         return MongoDBInterface.__mongo_client
 
-    def get_mdb(self, db_name=None):
+    @staticmethod
+    def get_codec_options():
+        """Returns the MongoDB codec options.
+        """
+        return MongoDBInterface.__codec_options
+
+    def get_mdb(self, name=None):
         """Return the database object
         """
-        if db_name:
-            self.db_name = db_name
-            self.mdb = None
-        else:
-            if not self.db_name:
-                self.db_name = os.environ.get('MONGODB_DBNAME')
+        db_name = name
+        if not db_name:
+            db_name = os.environ.get('MONGODB_DBNAME')
 
-        if self.mdb is None:
-            self.mdb = pymongo.database.Database(
-                client=self.get_client(),
-                name=self.db_name,
-                codec_options=MongoDBInterface.__codec_options
+        mdb = MongoDBDatabase(name=db_name, parent=self)
+
+        return mdb
+
+    def disconnect(self):
+        """Disconnect from the MongoDB service.
+        """
+        MongoDBInterface.__mongo_client.close()
+        MongoDBInterface.__mongo_client = None
+        self.mdb = None
+        self.db_name = None
+
+class MongoDBDatabase:
+    """MongoDB Database class.
+
+    Environment Variables:
+        MONGODB_DBNAME: Database name.
+
+    Attributes:
+        mdb: MongoDB database
+        db_name: Name of the interfacing database.
+        mongo_client: MongoDB client.
+
+    Exceptions:
+        DuplicateKeyError: MongoDB duplicate key error
+    """
+    def __init__(self, name: str, parent: MongoDBInterface):
+        """Initializes the database with the interface and database name.
+
+        Args:
+            name: The name of the database.
+            parent: MongoDBInterface object
+        """
+        # initialize object variables
+        self.name = name
+        self._interface = parent
+
+        self._mdb = None
+        if self._name:
+            self._mdb = pymongo.database.Database(
+                client=self._interface.get_client(),
+                name=self._name,
+                codec_options=self._interface.get_codec_options()
             )
 
-        return self.mdb
+    @property
+    def name(self):
+        """Returns the name of the database.
+
+        Returns:
+            Name of the database.
+        """
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        """Stores the name of the database.
+
+        Args:
+            name: Name of the database.
+        """
+        self._name = name
+
+    @property
+    def database(self):
+        """Returns the MongoDB database object.
+        """
+        return self._mdb
+
+    @property
+    def interface(self):
+        """Returns the MongoDBInterface object.
+        """
+        return self._interface
 
     def create_collection(self, name):
         """Creates and returns the specified collection.
@@ -153,7 +220,7 @@ class MongoDBInterface:
         Returns:
             The MongoDB collection object.
         """
-        return self.mdb.create_collection(name=name)
+        return self._mdb.create_collection(name=name)
 
     def read_collection(self, name):
         """Returns the specified collection.
@@ -164,7 +231,7 @@ class MongoDBInterface:
         Returns:
             The MongoDB collection object.
         """
-        return self.mdb.get_collection(name=name)
+        return self._mdb.get_collection(name=name)
 
     def delete_collection(self, name):
         """Deletes the specified collection.
@@ -175,15 +242,9 @@ class MongoDBInterface:
         Returns:
             None
         """
-        self.mdb.drop_collection(name_or_collection=name)
+        self._mdb.drop_collection(name_or_collection=name)
 
     def __getattr__(self, name):
-        return self.read_collection(name)
-
-    def disconnect(self):
-        """Disconnect from the MongoDB service.
+        """Return the collection for the specified attribute name.
         """
-        MongoDBInterface.__mongo_client.close()
-        MongoDBInterface.__mongo_client = None
-        self.mdb = None
-        self.db_name = None
+        return self.read_collection(name)

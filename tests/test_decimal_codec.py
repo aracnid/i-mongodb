@@ -11,8 +11,8 @@ from i_mongodb import MongoDBInterface
 def fixture_mongodb_interface():
     """Pytest fixture to initialize and return the MongoDBInterface object.
     """
-    mdb = MongoDBInterface().get_mdb(db_name='_testdb')
-    return mdb.get_collection('_test')
+    mdb = MongoDBInterface().get_mdb(name='_testdb')
+    return mdb.read_collection('_test')
 
 def test_encode_decimal(test_collection):
     """Tests inserting a document with Decimal values.
