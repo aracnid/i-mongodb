@@ -5,4 +5,4 @@
 from i_mongodb.i_mongodb import MongoDBInterface, MongoDBDatabase
 
 
-__version__ = '1.0.1'
+__version__ = '2.0.0'
