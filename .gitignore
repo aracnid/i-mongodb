@@ -1,11 +1,12 @@
 __pycache__*
+.coverage
+.vscode/*
 *.sublime-workspace
 *.sublime-project
 *.code-workspace
 *.env
 *.egg-info/*
-dist/*
 certs/*
+dist/*
 temp/*
-pip.log
-.vscode/*
+tests/cov.xml
