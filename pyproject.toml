@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "i-mongodb"
-version = "2.1.5"
+version = "2.2.0"
 description = "Customized connector to MongoDB"
 authors = ["Jason Romano <aracnid@gmail.com>"]
 license = "MIT"
