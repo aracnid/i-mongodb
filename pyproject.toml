@@ -13,7 +13,7 @@ packages = [{include = "i_mongodb"}]
 python = "^3.10"
 aracnid_logger = "^1.0"
 dnspython = "^1.16"
-pymongo = {version = "^4.3", extras = ["srv"]}
+pymongo = {version = "^4.10", extras = ["srv"]}
 python-dateutil = "^2.8"
 
 [tool.poetry.group.dev.dependencies]
