@@ -17,7 +17,7 @@ pymongo = {version = "^4.3", extras = ["srv"]}
 python-dateutil = "^2.8"
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^2.15"
+pylint = "^3.0"
 pytest = "^7.2"
 pytest-cov = "^4.0.0"
 
@@ -26,6 +26,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-addopts = "-p no:warnings --cov-report xml:tests/cov.xml --cov=i_mongodb tests/"
+#addopts = "-p no:warnings --cov-report xml:tests/cov.xml --cov=i_mongodb tests/"
+addopts = "-p no:warnings"
 log_cli = true
 log_cli_level = "DEBUG"
