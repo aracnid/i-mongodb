@@ -9,7 +9,10 @@ from aracnid_logger import Logger
 from bson.codec_options import CodecOptions, TypeCodec, TypeRegistry
 from bson.decimal128 import Decimal128
 from dateutil import tz
-import pymongo
+# import pymongo
+from pymongo import MongoClient
+from pymongo.database import Database
+from pymongo.errors import DuplicateKeyError
 
 # initialize logging
 logger = Logger(__name__).get_logger()
@@ -65,7 +68,7 @@ class MongoDBInterface:
         DuplicateKeyError: MongoDB duplicate key error
     """
 
-    DuplicateKeyError = pymongo.errors.DuplicateKeyError
+    # DuplicateKeyError = pymongo.errors.DuplicateKeyError
 
     __connection_string = None
     __mongo_client = None
@@ -117,7 +120,7 @@ class MongoDBInterface:
         This function will connect to the service once, if it hasn't be established.
         """
         if MongoDBInterface.__mongo_client is None:
-            MongoDBInterface.__mongo_client = pymongo.MongoClient(
+            MongoDBInterface.__mongo_client = MongoClient(
                 host=MongoDBInterface.__connection_string
             )
 
@@ -175,7 +178,7 @@ class MongoDBDatabase:
 
         self._mdb = None
         if self._name:
-            self._mdb = pymongo.database.Database(
+            self._mdb = Database(
                 client=self._interface.get_client(),
                 name=self._name,
                 codec_options=self._interface.get_codec_options()
