@@ -5,4 +5,4 @@ from importlib.metadata import version
 from i_mongodb.i_mongodb import MongoDBInterface, MongoDBDatabase
 
 
-__version__ = '2.1.1'
+__version__ = '2.1.2'
